@@ -1,9 +1,9 @@
 import { create } from 'zustand';
 import { Email, Folder } from '../types/email';
 import { emailService } from '../services/api';
-import dayjs from 'dayjs';
 
-// Mock data
+// Mock data (comentado - no se usa actualmente)
+/*
 const MOCK_EMAILS: Email[] = [
   {
     id: 1,
@@ -104,6 +104,7 @@ const MOCK_EMAILS: Email[] = [
     hasAttachments: false
   }
 ];
+*/
 
 interface EmailStore {
   emails: Email[];
@@ -163,6 +164,11 @@ export const useEmailStore = create<EmailStore>((set, get) => ({
   },
 
   setSelectedEmailId: async (id) => {
+    if (id === null) {
+      set({ selectedEmailId: null });
+      return;
+    }
+    
     const email = get().emails.find(e => e.id === id);
     if (email && !email.read) {
       await get().markAsRead(id);
@@ -222,17 +228,6 @@ export const useEmailStore = create<EmailStore>((set, get) => ({
   toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
 
   toggleCompose: () => set((state) => ({ composeOpen: !state.composeOpen })),
-
-  loadEmails: async () => {
-    try {
-      const { currentFolder } = get();
-      const emails = await emailService.getEmails(currentFolder);
-      set({ emails });
-    } catch (error) {
-      console.error('Error loading emails:', error);
-      get().showToast('Error al cargar correos');
-    }
-  },
 
   toggleStar: async (id) => {
     try {

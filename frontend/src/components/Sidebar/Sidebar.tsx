@@ -14,13 +14,13 @@ export default function Sidebar() {
   };
   const unreadCount = getUnreadCount();
 
-  const navItems = [
+  const navItems: Array<{ id: string; label: string; icon: string; count?: number }> = [
     { id: 'inbox', label: 'Recibidos', icon: 'inbox', count: unreadCount },
     { id: 'starred', label: 'Destacados', icon: 'star' },
     { id: 'sent', label: 'Enviados', icon: 'send' },
     { id: 'drafts', label: 'Borradores', icon: 'draft' },
     { id: 'trash', label: 'Papelera', icon: 'delete' },
-  ] as const;
+  ];
 
   const labels = [
     { name: 'Trabajo', color: 'bg-emerald-400' },

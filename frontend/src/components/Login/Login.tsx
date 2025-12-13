@@ -1,13 +1,11 @@
 import { useState } from 'react';
 import { authService } from '../../services/authService';
-import { useEmailStore } from '../../store/emailStore';
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const { setCurrentFolder } = useEmailStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

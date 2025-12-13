@@ -1,9 +1,6 @@
-import { useEmailStore } from '../../store/emailStore';
 import EmailDetail from '../EmailDetail/EmailDetail';
 
 export default function EmailDetailPane() {
-  const { selectedEmailId } = useEmailStore();
-
   return (
     <div
       id="email-detail-pane"

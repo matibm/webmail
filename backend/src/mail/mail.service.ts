@@ -204,7 +204,7 @@ export class MailService {
 
                 return {
                     id: msg.attributes.uid,
-                    seq: msg.seqno || msg.seqNo || 0,
+                    seq: msg.seqNo || 0,
                     subject: subject,
                     from: from,
                     date: date,

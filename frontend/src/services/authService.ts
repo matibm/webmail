@@ -10,9 +10,14 @@ export interface LoginResponse {
   email: string;
 }
 
+// Usar la URL del backend en producción, o '/api' en desarrollo (que usa el proxy de Vite)
+const baseURL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? '/api'
+  : 'https://webmail-txvs.onrender.com/api';
+
 export const authService = {
   login: async (credentials: LoginCredentials): Promise<LoginResponse> => {
-    const response = await axios.post('/api/auth/login', credentials);
+    const response = await axios.post(`${baseURL}/auth/login`, credentials);
     const { access_token, email } = response.data;
     
     // Guardar token en localStorage

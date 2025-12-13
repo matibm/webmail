@@ -1,8 +1,13 @@
 import axios from 'axios';
 import { BackendEmail, BackendEmailDetail, Email, mapBackendEmailToEmail, Folder } from '../types/email';
 
+// Usar la URL del backend en producción, o '/api' en desarrollo (que usa el proxy de Vite)
+const baseURL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? '/api'
+  : 'https://webmail-txvs.onrender.com/api';
+
 const api = axios.create({
-  baseURL: '/api',
+  baseURL,
   headers: {
     'Content-Type': 'application/json',
   },

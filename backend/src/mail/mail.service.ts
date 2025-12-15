@@ -84,7 +84,7 @@ export class MailService {
         return cleaned.substring(0, 150) || '(Sin contenido)';
     }
 
-    async getMessages(user: any, folder: string = 'inbox') {
+    async getMessages(user: any, folder: string = 'inbox', limit: number = 50, offset: number = 0) {
         const boxName = this.mapFolder(folder);
         const connection = await imaps.connect(this.getImapConfig(user));
 
@@ -92,16 +92,86 @@ export class MailService {
             await connection.openBox(boxName);
 
             const searchCriteria = (folder === 'starred') ? [['FLAGGED']] : ['ALL'];
+            
+            // Primero obtener solo los headers para ordenar por fecha sin descargar todos los cuerpos
+            const headerSearchOptions = {
+                bodies: 'HEADER', // Solo headers, no el cuerpo completo
+                markSeen: false,
+                struct: true
+            };
+            
+            const allMessages = await connection.search(searchCriteria, headerSearchOptions);
+            
+            // Extraer fechas de los headers y crear array con UID y fecha
+            const messagesWithDates = allMessages.map(msg => {
+                const headerPart = msg.parts.find((p) => p.which === 'HEADER');
+                let date = new Date(0); // Fecha por defecto muy antigua
+                
+                if (headerPart?.body?.date?.[0]) {
+                    const dateValue = headerPart.body.date[0];
+                    if (dateValue instanceof Date) {
+                        date = dateValue;
+                    } else if (typeof dateValue === 'string') {
+                        const parsed = new Date(dateValue);
+                        if (!isNaN(parsed.getTime())) {
+                            date = parsed;
+                        }
+                    }
+                }
+                
+                return {
+                    uid: msg.attributes.uid,
+                    date: date.getTime(),
+                    msg: msg
+                };
+            });
+
+            // Ordenar por fecha descendente (más reciente primero)
+            messagesWithDates.sort((a, b) => b.date - a.date);
+
+            // Aplicar paginación
+            const paginatedMessages = messagesWithDates.slice(offset, offset + limit);
+            
+            if (paginatedMessages.length === 0) {
+                return [];
+            }
+
+            // Obtener los UIDs paginados
+            const paginatedUids = paginatedMessages.map(m => m.uid);
+
+            // Ahora obtener el contenido completo solo de los UIDs paginados
             const fetchOptions = {
                 bodies: ['HEADER', ''], // Fetch both header and full body
                 markSeen: false,
                 struct: true
             };
 
-            // Fetch dynamic range? For now get all but limit might be needed
-            const messages = await connection.search(searchCriteria, fetchOptions);
+            // Obtener los cuerpos completos de los mensajes paginados
+            // Para múltiples UIDs, hacer búsquedas individuales en paralelo ya que el formato de lista
+            // puede no funcionar correctamente con imap-simple
+            let messages: any[] = [];
+            
+            if (paginatedUids.length === 1) {
+                // Un solo UID
+                const uidCriteria = [['UID', paginatedUids[0].toString()]];
+                const result = await connection.search(uidCriteria, fetchOptions);
+                messages = result;
+            } else {
+                // Para múltiples UIDs, hacer búsquedas individuales en paralelo
+                // Esto asegura que funcione correctamente con cualquier servidor IMAP
+                const searchPromises = paginatedUids.map(uid => {
+                    const uidCriteria = [['UID', uid.toString()]];
+                    return connection.search(uidCriteria, fetchOptions);
+                });
+                const results = await Promise.all(searchPromises);
+                messages = results.flat();
+            }
+            
+            // Crear un mapa para preservar el orden por fecha
+            const uidOrderMap = new Map(paginatedMessages.map((m, idx) => [m.uid, idx]));
 
-            return await Promise.all(messages.map(async (msg) => {
+            // Mapear los mensajes y preservar el orden por fecha que ya calculamos
+            const mappedMessages = await Promise.all(messages.map(async (msg) => {
                 const headerPart = msg.parts.find((p) => p.which === 'HEADER');
                 const fullBodyPart = msg.parts.find(p => p.which === '');
 
@@ -215,6 +285,15 @@ export class MailService {
                     hasAttachments: hasAttachments
                 };
             }));
+
+            // Ordenar por el orden que ya calculamos (más reciente primero)
+            mappedMessages.sort((a, b) => {
+                const orderA = uidOrderMap.get(a.id) ?? 9999;
+                const orderB = uidOrderMap.get(b.id) ?? 9999;
+                return orderA - orderB; // Mantener el orden que ya calculamos
+            });
+
+            return mappedMessages;
         } finally {
             connection.end();
         }

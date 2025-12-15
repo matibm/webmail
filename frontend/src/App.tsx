@@ -18,7 +18,8 @@ function App() {
     if (isAuthenticated) {
       loadEmails();
     }
-  }, [isAuthenticated, loadEmails]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated]); // No incluir loadEmails para evitar re-renders innecesarios
 
   if (!isAuthenticated) {
     return <Login />;

@@ -115,8 +115,13 @@ interface EmailStore {
   composeOpen: boolean;
   toastMessage: string | null;
   
+  // Paginación
+  currentPage: number;
+  pageSize: number;
+  hasMore: boolean;
+  
   // Actions
-  loadEmails: () => Promise<void>;
+  loadEmails: (page?: number) => Promise<void>;
   setCurrentFolder: (folder: Folder) => Promise<void>;
   setSelectedEmailId: (id: number | null) => Promise<void>;
   setSearchTerm: (term: string) => void;
@@ -129,6 +134,9 @@ interface EmailStore {
   showToast: (message: string) => void;
   getFilteredEmails: () => Email[];
   getUnreadCount: () => number;
+  nextPage: () => Promise<void>;
+  previousPage: () => Promise<void>;
+  goToPage: (page: number) => Promise<void>;
 }
 
 export const useEmailStore = create<EmailStore>((set, get) => ({
@@ -139,12 +147,21 @@ export const useEmailStore = create<EmailStore>((set, get) => ({
   sidebarOpen: false,
   composeOpen: false,
   toastMessage: null,
+  currentPage: 1,
+  pageSize: 50,
+  hasMore: false,
 
-  loadEmails: async () => {
+  loadEmails: async (page: number = 1) => {
     try {
-      const { currentFolder } = get();
-      const emails = await emailService.getEmails(currentFolder);
-      set({ emails });
+      const { currentFolder, pageSize } = get();
+      const offset = (page - 1) * pageSize;
+      const emails = await emailService.getEmails(currentFolder, pageSize, offset);
+      // Si recibimos menos emails que el pageSize, no hay más páginas
+      set({ 
+        emails, 
+        currentPage: page,
+        hasMore: emails.length === pageSize 
+      });
     } catch (error) {
       console.error('Error loading emails:', error);
       get().showToast('Error al cargar correos');
@@ -152,11 +169,16 @@ export const useEmailStore = create<EmailStore>((set, get) => ({
   },
 
   setCurrentFolder: async (folder) => {
-    set({ currentFolder: folder, selectedEmailId: null });
-    // Cargar emails del nuevo folder
+    set({ currentFolder: folder, selectedEmailId: null, currentPage: 1 });
+    // Cargar emails del nuevo folder desde la primera página
     try {
-      const emails = await emailService.getEmails(folder);
-      set({ emails });
+      const { pageSize } = get();
+      const emails = await emailService.getEmails(folder, pageSize, 0);
+      set({ 
+        emails, 
+        currentPage: 1,
+        hasMore: emails.length === pageSize 
+      });
     } catch (error) {
       console.error('Error loading folder emails:', error);
       get().showToast('Error al cargar correos');
@@ -318,6 +340,26 @@ export const useEmailStore = create<EmailStore>((set, get) => ({
 
   getUnreadCount: () => {
     return get().emails.filter((e) => !e.read && e.folder === 'inbox').length;
+  },
+
+  nextPage: async () => {
+    const { currentPage, hasMore } = get();
+    if (hasMore) {
+      await get().loadEmails(currentPage + 1);
+    }
+  },
+
+  previousPage: async () => {
+    const { currentPage } = get();
+    if (currentPage > 1) {
+      await get().loadEmails(currentPage - 1);
+    }
+  },
+
+  goToPage: async (page: number) => {
+    if (page >= 1) {
+      await get().loadEmails(page);
+    }
   },
 }));
 

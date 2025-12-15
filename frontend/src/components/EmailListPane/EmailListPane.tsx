@@ -2,7 +2,15 @@ import EmailList from '../EmailList/EmailList';
 import { useEmailStore } from '../../store/emailStore';
 
 export default function EmailListPane() {
-  const { searchTerm, setSearchTerm } = useEmailStore();
+  const { 
+    searchTerm, 
+    setSearchTerm, 
+    currentPage, 
+    hasMore, 
+    nextPage, 
+    previousPage,
+    loadEmails 
+  } = useEmailStore();
 
   return (
     <div
@@ -34,7 +42,40 @@ export default function EmailListPane() {
       </div>
 
       {/* The List */}
-      <EmailList />
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <EmailList />
+        
+        {/* Paginación */}
+        <div className="border-t border-slate-200 px-4 py-3 flex items-center justify-between bg-white">
+          <button
+            onClick={() => previousPage()}
+            disabled={currentPage === 1}
+            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+              currentPage === 1
+                ? 'text-slate-400 cursor-not-allowed'
+                : 'text-slate-700 hover:bg-slate-100'
+            }`}
+          >
+            <span className="material-symbols-outlined text-lg">chevron_left</span>
+          </button>
+          
+          <span className="text-sm text-slate-600">
+            Página {currentPage}
+          </span>
+          
+          <button
+            onClick={() => nextPage()}
+            disabled={!hasMore}
+            className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${
+              !hasMore
+                ? 'text-slate-400 cursor-not-allowed'
+                : 'text-slate-700 hover:bg-slate-100'
+            }`}
+          >
+            <span className="material-symbols-outlined text-lg">chevron_right</span>
+          </button>
+        </div>
+      </div>
     </div>
   );
 }

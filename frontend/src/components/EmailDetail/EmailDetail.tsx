@@ -1,5 +1,7 @@
 import { useEmailStore } from '../../store/emailStore';
 import dayjs from '../../utils/dayjs';
+import Avatar from '../Avatar/Avatar';
+import paperAirplanePlaceholder from '../../assets/paper-airplane-placeholder.jpeg';
 
 export default function EmailDetail() {
   const {
@@ -55,11 +57,9 @@ export default function EmailDetail() {
         className="hidden md:flex flex-col items-center justify-center h-full text-center p-8"
       >
         <img
-          style={{ aspectRatio: '1/1' }}
-          src="data:image/svg+xml;base64,IDxzdmcgd2lkdGg9IjEwMjQiIGhlaWdodD0iMTAyNCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIHByZXNlcnZlQXNwZWN0UmF0aW89Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+IDxkZWZzPiA8bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSItMTAwJSIgeTE9IjAiIHgyPSIwIiB5Mj0iMCI+IDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2IwYjBiMCIvPiA8c3RvcCBvZmZzZXQ9Ii41IiBzdG9wLWNvbG9yPSIjZjBmMGYwIi8+IDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2IwYjBiMCIvPiA8YW5pbWF0ZVRyYW5zZm9ybSBpZD0iYSIgYXR0cmlidXRlTmFtZT0iZ3JhZGllbnRUcmFuc2Zvcm0iIHR5cGU9InRyYW5zbGF0ZSIgZnJvbT0iMCIgdG89IjIiIGR1cj0iMXMiIGJlZ2luPSIwcyIvPiA8YW5pbWF0ZVRyYW5zZm9ybSBpZD0iYiIgYXR0cmlidXRlTmFtZT0iZ3JhZGllbnRUcmFuc2Zvcm0iIHR5cGU9InRyYW5zbGF0ZSIgZnJvbT0iMCIgdG89IjIiIGR1cj0iMS41cyIgYmVnaW49ImEuZW5kIi8+IDxhbmltYXRlVHJhbnNmb3JtIGF0dHJpYnV0ZU5hbWU9ImdyYWRpZW50VHJhbnNmb3JtIiB0eXBlPSJ0cmFuc2xhdGUiIGZyb209IjAiIHRvPSIyIiBkdXI9IjJzIiBiZWdpbj0iYi5lbmQiIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIi8+IDwvbGluZWFyR3JhZGllbnQ+IDwvZGVmcz4gPHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9InVybCgjZykiLz4gPC9zdmc+"
-          go-data-src="/gen?prompt=illustration+of+a+clean+empty+mailbox+with+soft+colors+minimalist&aspect=1:1"
+          src={paperAirplanePlaceholder}
           className="w-64 h-64 object-contain mb-6 opacity-80"
-          alt="Empty"
+          alt="Avión de papel"
         />
         <h2 className="text-2xl font-semibold text-slate-800 mb-2">
           Selecciona un correo
@@ -153,10 +153,11 @@ export default function EmailDetail() {
           {/* Sender Info */}
           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 pb-8 border-b border-slate-100 gap-4">
             <div className="flex items-center gap-4 min-w-0">
-              <img
-                src={email.avatar}
-                alt={email.sender}
-                className="w-12 h-12 rounded-full object-cover bg-slate-200 shrink-0"
+              <Avatar
+                name={email.sender}
+                email={email.email}
+                size={48}
+                imageUrl={email.avatar}
               />
               <div className="min-w-0 flex-1">
                 <div className="flex flex-col sm:flex-row sm:items-baseline gap-1 sm:gap-2">
@@ -184,7 +185,11 @@ export default function EmailDetail() {
           <div className="mb-8">
             {email.body && email.body.includes('<') ? (
               <div
-                className="prose prose-slate max-w-none text-slate-700 leading-relaxed email-body"
+                className="email-body"
+                style={{
+                  color: '#334155',
+                  lineHeight: '1.6',
+                }}
                 dangerouslySetInnerHTML={{ __html: email.body }}
               />
             ) : (
@@ -231,11 +236,10 @@ export default function EmailDetail() {
 
           {/* Reply Box */}
           <div className="flex gap-4 mt-8 pt-8 border-t border-slate-100">
-            <img
-              style={{ aspectRatio: '1/1' }}
-              src="data:image/svg+xml;base64,IDxzdmcgd2lkdGg9IjEwMjQiIGhlaWdodD0iMTAyNCIgdmlld0JveD0iMCAwIDEwMCAxMDAiIHByZXNlcnZlQXNwZWN0UmF0aW89Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+IDxkZWZzPiA8bGluZWFyR3JhZGllbnQgaWQ9ImciIHgxPSItMTAwJSIgeTE9IjAiIHgyPSIwIiB5Mj0iMCI+IDxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iI2IwYjBiMCIvPiA8c3RvcCBvZmZzZXQ9Ii41IiBzdG9wLWNvbG9yPSIjZjBmMGYwIi8+IDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2IwYjBiMCIvPiA8YW5pbWF0ZVRyYW5zZm9ybSBpZD0iYSIgYXR0cmlidXRlTmFtZT0iZ3JhZGllbnRUcmFuc2Zvcm0iIHR5cGU9InRyYW5zbGF0ZSIgZnJvbT0iMCIgdG89IjIiIGR1cj0iMXMiIGJlZ2luPSIwcyIvPiA8YW5pbWF0ZVRyYW5zZm9ybSBpZD0iYiIgYXR0cmlidXRlTmFtZT0iZ3JhZGllbnRUcmFuc2Zvcm0iIHR5cGU9InRyYW5zbGF0ZSIgZnJvbT0iMCIgdG89IjIiIGR1cj0iMS41cyIgYmVnaW49ImEuZW5kIi8+IDxhbmltYXRlVHJhbnNmb3JtIGF0dHJpYnV0ZU5hbWU9ImdyYWRpZW50VHJhbnNmb3JtIiB0eXBlPSJ0cmFuc2xhdGUiIGZyb209IjAiIHRvPSIyIiBkdXI9IjJzIiBiZWdpbj0iYi5lbmQiIHJlcGVhdENvdW50PSJpbmRlZmluaXRlIi8+IDwvbGluZWFyR3JhZGllbnQ+IDwvZGVmcz4gPHJlY3Qgd2lkdGg9IjEwMCIgaGVpZ2h0PSIxMDAiIGZpbGw9InVybCgjZykiLz4gPC9zdmc+"
-              go-data-src="/gen?prompt=professional+headshot+of+a+creative+designer+smiling+warm+lighting&aspect=1:1"
-              className="w-10 h-10 rounded-full object-cover"
+            <Avatar
+              name={localStorage.getItem('email') || 'Usuario'}
+              email={localStorage.getItem('email') || undefined}
+              size={40}
             />
             <div className="flex-1 relative group">
               <div className="absolute inset-0 border border-slate-300 rounded-lg shadow-sm pointer-events-none group-focus-within:ring-2 group-focus-within:ring-blue-100 group-focus-within:border-blue-500 transition-all"></div>

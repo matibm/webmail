@@ -60,8 +60,8 @@ export const mapBackendEmailToEmail = (backendEmail: BackendEmail, folder: Folde
     email = '(Unknown)';
   }
   
-  // Generar avatar placeholder basado en el email
-  const avatar = `/gen?prompt=professional+headshot+of+a+person+smiling+warm+lighting&aspect=1:1`;
+  // Avatar - dejamos vacío para que el componente Avatar genere uno automáticamente con colores
+  const avatar = '';
 
   // Parsear fecha de forma segura
   let time = new Date();

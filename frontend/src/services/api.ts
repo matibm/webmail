@@ -40,11 +40,15 @@ api.interceptors.response.use(
 );
 
 export const emailService = {
-  // Obtener lista de correos
-  getEmails: async (folder: Folder = 'inbox'): Promise<Email[]> => {
+  // Obtener lista de correos con paginación
+  getEmails: async (folder: Folder = 'inbox', limit: number = 50, offset: number = 0): Promise<Email[]> => {
     try {
       const response = await api.get<BackendEmail[]>('/mail', { 
-        params: { folder: folder === 'starred' ? 'starred' : folder } 
+        params: { 
+          folder: folder === 'starred' ? 'starred' : folder,
+          limit,
+          offset
+        } 
       });
       return response.data.map((email) => mapBackendEmailToEmail(email, folder));
     } catch (error) {

@@ -55,32 +55,38 @@ body {
   animation: fadeIn 0.2s ease-out forwards;
 }
 
-/* Email body styling */
+/* Email body styling - Preservar estilos originales del correo */
 .email-body {
   word-wrap: break-word;
   overflow-wrap: break-word;
+  color: #334155;
+  line-height: 1.6;
 }
 
+/* Imágenes responsivas pero sin forzar estilos */
 .email-body img {
   max-width: 100%;
   height: auto;
 }
 
-.email-body pre {
+/* Estilos para pre solo si no tienen estilos propios */
+.email-body pre:not([style*="background"]):not([style*="padding"]) {
   background: #f5f5f5;
   padding: 1rem;
   border-radius: 0.5rem;
   overflow-x: auto;
 }
 
-.email-body code {
+/* Estilos para code solo si no tienen estilos propios */
+.email-body code:not([style*="background"]):not([style*="padding"]) {
   background: #f5f5f5;
   padding: 0.2rem 0.4rem;
   border-radius: 0.25rem;
   font-size: 0.9em;
 }
 
-.email-body blockquote {
+/* Estilos para blockquote solo si no tienen estilos propios */
+.email-body blockquote:not([style*="border"]):not([style*="padding"]) {
   border-left: 4px solid #3b82f6;
   padding-left: 1rem;
   margin-left: 0;
@@ -88,19 +94,22 @@ body {
   font-style: italic;
 }
 
+/* Tablas - NO aplicar bordes por defecto, dejar que los estilos inline del correo prevalezcan */
 .email-body table {
   width: 100%;
   border-collapse: collapse;
   margin: 1rem 0;
 }
 
+/* Remover bordes de tablas por defecto - solo usar los que vienen en el correo original */
 .email-body table td,
 .email-body table th {
-  border: 1px solid #e2e8f0;
   padding: 0.5rem;
+  /* No aplicar border por defecto - solo usar estilos inline del correo */
 }
 
-.email-body a {
+/* Links - solo aplicar color si no tienen color definido en el correo */
+.email-body a:not([style*="color"]) {
   color: #3b82f6;
   text-decoration: underline;
 }

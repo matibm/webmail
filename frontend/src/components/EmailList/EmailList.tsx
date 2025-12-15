@@ -1,5 +1,6 @@
 import { useEmailStore } from '../../store/emailStore';
 import dayjs from '../../utils/dayjs';
+import Avatar from '../Avatar/Avatar';
 
 export default function EmailList() {
   const {
@@ -47,18 +48,26 @@ export default function EmailList() {
               }`}
           >
             <div className="flex justify-between items-start mb-1">
-              <div className="flex items-center gap-2">
-                {!email.read && (
-                  <span className="w-2 h-2 rounded-full bg-blue-600"></span>
-                )}
-                <h3
-                  className={`text-sm truncate max-w-[120px] sm:max-w-[180px] ${!email.read
-                      ? 'font-bold text-slate-900'
-                      : 'font-medium text-slate-700'
-                    }`}
-                >
-                  {email.sender}
-                </h3>
+              <div className="flex items-center gap-3 flex-1 min-w-0">
+                <Avatar
+                  name={email.sender}
+                  email={email.email}
+                  size={40}
+                  imageUrl={email.avatar}
+                />
+                <div className="flex items-center gap-2 flex-1 min-w-0">
+                  {!email.read && (
+                    <span className="w-2 h-2 rounded-full bg-blue-600 shrink-0"></span>
+                  )}
+                  <h3
+                    className={`text-sm truncate ${!email.read
+                        ? 'font-bold text-slate-900'
+                        : 'font-medium text-slate-700'
+                      }`}
+                  >
+                    {email.sender}
+                  </h3>
+                </div>
               </div>
               <span className="text-xs text-slate-400 whitespace-nowrap ml-2">
                 {timeStr}

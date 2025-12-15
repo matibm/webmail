@@ -9,8 +9,15 @@ export class MailController {
     constructor(private readonly mailService: MailService) { }
 
     @Get()
-    async getEmails(@Request() req, @Query('folder') folder: string) {
-        return this.mailService.getMessages(req.user, folder);
+    async getEmails(
+        @Request() req, 
+        @Query('folder') folder: string,
+        @Query('limit') limit?: string,
+        @Query('offset') offset?: string
+    ) {
+        const limitNum = limit ? parseInt(limit, 10) : 50;
+        const offsetNum = offset ? parseInt(offset, 10) : 0;
+        return this.mailService.getMessages(req.user, folder, limitNum, offsetNum);
     }
 
     @Get('message/:uid')

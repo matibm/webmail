@@ -8,8 +8,7 @@ export default function EmailListPane() {
     currentPage, 
     hasMore, 
     nextPage, 
-    previousPage,
-    loadEmails 
+    previousPage
   } = useEmailStore();
 
   return (
